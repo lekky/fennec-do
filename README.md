@@ -1,1 +1,78 @@
-# fennec-do
+# Fennec Do
+
+A modern, colorful todo list application with cross-platform syncing.
+
+## Features
+
+- Colorful custom tags for organizing todos
+- Priority levels (High, Medium, Low)
+- Real-time sync between Web and Android apps
+- Modern, clean interface
+- Personal use optimized
+
+## Architecture
+
+### Backend (`/backend`)
+- Node.js + Express REST API
+- SQLite database for data persistence
+- RESTful endpoints for todos and tags
+- Sync mechanism for cross-platform support
+
+### Web App (`/webapp`)
+- React + Vite
+- Responsive design
+- Priority-based todo sections
+- Colorful tag system
+
+### Android App (`/android`)
+- Kotlin
+- Material Design 3
+- Background sync
+- Native Android experience
+
+## Getting Started
+
+### Backend
+```bash
+cd backend
+npm install
+npm start
+```
+
+### Web App
+```bash
+cd webapp
+npm install
+npm run dev
+```
+
+### Android App
+Open the `android` folder in Android Studio and run the project.
+
+## Database Schema
+
+**Todos**
+- id: unique identifier
+- title: todo text
+- priority: high | medium | low
+- completed: boolean
+- createdAt: timestamp
+- updatedAt: timestamp
+- tags: array of tag IDs
+
+**Tags**
+- id: unique identifier
+- name: tag name
+- color: hex color code
+
+## API Endpoints
+
+- `GET /api/todos` - Get all todos
+- `POST /api/todos` - Create new todo
+- `PUT /api/todos/:id` - Update todo
+- `DELETE /api/todos/:id` - Delete todo
+- `GET /api/tags` - Get all tags
+- `POST /api/tags` - Create new tag
+- `PUT /api/tags/:id` - Update tag
+- `DELETE /api/tags/:id` - Delete tag
+- `GET /api/sync` - Get all data (todos + tags)

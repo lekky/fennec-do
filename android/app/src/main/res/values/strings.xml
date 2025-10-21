@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fennec Do</string>
+    <string name="add_todo">Add Todo</string>
+    <string name="todo_hint">What needs to be done?</string>
+    <string name="high_priority">High Priority</string>
+    <string name="medium_priority">Medium Priority</string>
+    <string name="low_priority">Low Priority</string>
+    <string name="sync">Sync</string>
+    <string name="delete">Delete</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="tag_name_hint">Tag name</string>
+    <string name="manage_tags">Manage Tags</string>
+</resources>

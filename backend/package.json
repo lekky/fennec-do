@@ -1,0 +1,20 @@
+{
+  "name": "fennec-do-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Fennec Do todo application",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": ["todo", "api", "sync"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "better-sqlite3": "^9.2.2",
+    "uuid": "^9.0.1"
+  }
+}
