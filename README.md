@@ -56,8 +56,15 @@ Open the `android` folder in Android Studio and run the project.
 ## Deployment
 
 Want to deploy your backend online? See:
-- **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** - Fast deployment (5 minutes)
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Detailed deployment guide
+- **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** - Fast deployment (3-5 minutes)
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Comprehensive deployment guide
+
+### Recommended FREE Hosting (with persistent storage)
+
+- **Fly.io** - Completely FREE with 1GB persistent volume (Recommended)
+- **Railway** - $5 credit/month (includes storage, easiest setup)
+
+⚠️ **Note:** Render's free tier does NOT include persistent storage ($1/month extra for disk)
 
 ### Download Android APK
 
