@@ -32,22 +32,39 @@ A modern, colorful todo list application with cross-platform syncing.
 
 ## Getting Started
 
-### Backend
+See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed setup instructions.
+
+### Quick Start
+
+**Backend:**
 ```bash
 cd backend
 npm install
 npm start
 ```
 
-### Web App
+**Web App:**
 ```bash
 cd webapp
 npm install
 npm run dev
 ```
 
-### Android App
+**Android App:**
 Open the `android` folder in Android Studio and run the project.
+
+## Deployment
+
+Want to deploy your backend online? See:
+- **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** - Fast deployment (5 minutes)
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Detailed deployment guide
+
+### Download Android APK
+
+GitHub Actions automatically builds APKs:
+1. Go to **Actions** tab
+2. Click **Android Build** → **Run workflow**
+3. Download from **Artifacts**
 
 ## Database Schema
 
