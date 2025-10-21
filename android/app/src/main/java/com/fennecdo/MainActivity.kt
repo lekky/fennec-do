@@ -1,49 +1,52 @@
 package com.fennecdo
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fennecdo.adapter.TodoAdapter
-import com.fennecdo.api.ApiService
-import com.fennecdo.models.Todo
-import com.fennecdo.repository.TodoRepository
+import com.fennecdo.database.AppDatabase
+import com.fennecdo.database.TodoWithTags
+import com.fennecdo.repository.LocalTodoRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import android.widget.Spinner
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var repository: TodoRepository
+    private lateinit var repository: LocalTodoRepository
     private lateinit var todoInput: TextInputEditText
     private lateinit var prioritySpinner: Spinner
     private lateinit var addButton: MaterialButton
-    private lateinit var syncFab: FloatingActionButton
+    private lateinit var refreshFab: FloatingActionButton
 
     private lateinit var highPriorityAdapter: TodoAdapter
     private lateinit var mediumPriorityAdapter: TodoAdapter
     private lateinit var lowPriorityAdapter: TodoAdapter
 
-    private val allTodos = mutableListOf<Todo>()
+    private val allTodos = mutableListOf<TodoWithTags>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize repository
-        val apiService = ApiService.create()
-        repository = TodoRepository(apiService)
+        // Initialize database and repository
+        val database = AppDatabase.getDatabase(applicationContext)
+        repository = LocalTodoRepository(
+            database.todoDao(),
+            database.tagDao(),
+            database.todoTagDao()
+        )
 
         // Initialize views
         todoInput = findViewById(R.id.todoInput)
         prioritySpinner = findViewById(R.id.prioritySpinner)
         addButton = findViewById(R.id.addButton)
-        syncFab = findViewById(R.id.syncFab)
+        refreshFab = findViewById(R.id.syncFab)
 
         // Setup RecyclerViews
         setupRecyclerViews()
@@ -53,12 +56,12 @@ class MainActivity : AppCompatActivity() {
             addTodo()
         }
 
-        syncFab.setOnClickListener {
-            syncData()
+        refreshFab.setOnClickListener {
+            loadData()
         }
 
         // Load initial data
-        syncData()
+        loadData()
     }
 
     private fun setupRecyclerViews() {
@@ -101,15 +104,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            val result = repository.createTodo(title, priority)
-            result.onSuccess { newTodo ->
+            try {
+                val newTodo = repository.createTodo(title, priority)
+                val todoWithTags = TodoWithTags(newTodo, emptyList())
+
                 runOnUiThread {
-                    allTodos.add(0, newTodo)
+                    allTodos.add(0, todoWithTags)
                     updateAdapters()
                     todoInput.text?.clear()
                     Toast.makeText(this@MainActivity, "Todo added!", Toast.LENGTH_SHORT).show()
                 }
-            }.onFailure { e ->
+            } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(
                         this@MainActivity,
@@ -121,19 +126,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleTodo(todo: Todo) {
+    private fun toggleTodo(todoWithTags: TodoWithTags) {
         lifecycleScope.launch {
-            val updatedTodo = todo.copy(completed = !todo.completed)
-            val result = repository.updateTodo(updatedTodo)
-            result.onSuccess { newTodo ->
+            try {
+                val updatedTodo = todoWithTags.todo.copy(
+                    completed = !todoWithTags.todo.completed,
+                    updatedAt = System.currentTimeMillis()
+                )
+                repository.updateTodo(updatedTodo, todoWithTags.tags.map { it.id })
+
                 runOnUiThread {
-                    val index = allTodos.indexOfFirst { it.id == newTodo.id }
+                    val index = allTodos.indexOfFirst { it.todo.id == updatedTodo.id }
                     if (index != -1) {
-                        allTodos[index] = newTodo
+                        allTodos[index] = TodoWithTags(updatedTodo, todoWithTags.tags)
                         updateAdapters()
                     }
                 }
-            }.onFailure { e ->
+            } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(
                         this@MainActivity,
@@ -145,16 +154,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun deleteTodo(id: String) {
+    private fun deleteTodo(todoId: String) {
         lifecycleScope.launch {
-            val result = repository.deleteTodo(id)
-            result.onSuccess {
+            try {
+                repository.deleteTodo(todoId)
+
                 runOnUiThread {
-                    allTodos.removeIf { it.id == id }
+                    allTodos.removeIf { it.todo.id == todoId }
                     updateAdapters()
                     Toast.makeText(this@MainActivity, "Todo deleted!", Toast.LENGTH_SHORT).show()
                 }
-            }.onFailure { e ->
+            } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(
                         this@MainActivity,
@@ -166,21 +176,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun syncData() {
+    private fun loadData() {
         lifecycleScope.launch {
-            val result = repository.sync()
-            result.onSuccess { syncResponse ->
+            try {
+                val todos = repository.getAllTodosWithTags()
+
                 runOnUiThread {
                     allTodos.clear()
-                    allTodos.addAll(syncResponse.todos)
+                    allTodos.addAll(todos)
                     updateAdapters()
-                    Toast.makeText(this@MainActivity, "Synced!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Refreshed!", Toast.LENGTH_SHORT).show()
                 }
-            }.onFailure { e ->
+            } catch (e: Exception) {
                 runOnUiThread {
                     Toast.makeText(
                         this@MainActivity,
-                        "Failed to sync: ${e.message}",
+                        "Failed to load data: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -189,8 +200,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateAdapters() {
-        highPriorityAdapter.updateTodos(allTodos.filter { it.priority == "high" })
-        mediumPriorityAdapter.updateTodos(allTodos.filter { it.priority == "medium" })
-        lowPriorityAdapter.updateTodos(allTodos.filter { it.priority == "low" })
+        highPriorityAdapter.updateTodos(allTodos.filter { it.todo.priority == "high" })
+        mediumPriorityAdapter.updateTodos(allTodos.filter { it.todo.priority == "medium" })
+        lowPriorityAdapter.updateTodos(allTodos.filter { it.todo.priority == "low" })
     }
 }

@@ -9,14 +9,14 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.fennecdo.R
-import com.fennecdo.models.Todo
+import com.fennecdo.database.TodoWithTags
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 class TodoAdapter(
-    private var todos: List<Todo>,
-    private val onToggle: (Todo) -> Unit,
+    private var todos: List<TodoWithTags>,
+    private val onToggle: (TodoWithTags) -> Unit,
     private val onDelete: (String) -> Unit
 ) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
@@ -34,7 +34,8 @@ class TodoAdapter(
     }
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
-        val todo = todos[position]
+        val todoWithTags = todos[position]
+        val todo = todoWithTags.todo
 
         holder.checkbox.isChecked = todo.completed
         holder.title.text = todo.title
@@ -48,7 +49,7 @@ class TodoAdapter(
 
         // Clear and add tags
         holder.tagsGroup.removeAllViews()
-        todo.tags.forEach { tag ->
+        todoWithTags.tags.forEach { tag ->
             val chip = Chip(holder.itemView.context).apply {
                 text = tag.name
                 chipBackgroundColor = android.content.res.ColorStateList.valueOf(
@@ -60,7 +61,7 @@ class TodoAdapter(
         }
 
         holder.checkbox.setOnCheckedChangeListener { _, _ ->
-            onToggle(todo)
+            onToggle(todoWithTags)
         }
 
         holder.deleteButton.setOnClickListener {
@@ -70,7 +71,7 @@ class TodoAdapter(
 
     override fun getItemCount() = todos.size
 
-    fun updateTodos(newTodos: List<Todo>) {
+    fun updateTodos(newTodos: List<TodoWithTags>) {
         todos = newTodos
         notifyDataSetChanged()
     }

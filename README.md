@@ -1,102 +1,105 @@
 # Fennec Do
 
-A modern, colorful todo list application with cross-platform syncing.
+A modern, colorful todo list Android application with local storage.
 
 ## Features
 
-- Colorful custom tags for organizing todos
-- Priority levels (High, Medium, Low)
-- Real-time sync between Web and Android apps
-- Modern, clean interface
-- Personal use optimized
+- ✅ Colorful custom tags for organizing todos
+- ✅ Priority levels (High, Medium, Low)
+- ✅ Local SQLite storage (no internet required!)
+- ✅ Modern Material Design 3 interface
+- ✅ Completely offline and private
 
-## Architecture
+## Quick Start
 
-### Backend (`/backend`)
-- Node.js + Express REST API
-- SQLite database for data persistence
-- RESTful endpoints for todos and tags
-- Sync mechanism for cross-platform support
+### Download APK
 
-### Web App (`/webapp`)
-- React + Vite
-- Responsive design
-- Priority-based todo sections
-- Colorful tag system
+Get the latest APK from GitHub Actions:
+
+1. Go to the **[Actions tab](../../actions)**
+2. Click **Android Build** → **Run workflow**
+3. Wait for the build to complete
+4. Download the APK from **Artifacts**
+5. Install on your Android device (requires Android 7.0+)
+
+📱 See [ANDROID_README.md](ANDROID_README.md) for detailed Android app guide
+
+## Android App
+
+### Features
+
+- **Priority Sections**: Todos automatically organized by High, Medium, and Low priority
+- **Colorful Tags**: Create custom tags with your choice of colors
+- **Offline First**: All data stored locally on your device using Room database
+- **Material Design 3**: Modern, beautiful Android UI
+- **No Permissions**: Doesn't require internet or any special permissions
+
+### Build from Source
+
+Requirements:
+- Android Studio
+- JDK 8 or higher
+
+Steps:
+```bash
+git clone https://github.com/yourusername/fennec-do.git
+cd fennec-do
+# Open the 'android' folder in Android Studio
+# Click Run
+```
+
+## Tech Stack
 
 ### Android App (`/android`)
-- Kotlin
-- Material Design 3
-- Background sync
-- Native Android experience
-
-## Getting Started
-
-See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed setup instructions.
-
-### Quick Start
-
-**Backend:**
-```bash
-cd backend
-npm install
-npm start
-```
-
-**Web App:**
-```bash
-cd webapp
-npm install
-npm run dev
-```
-
-**Android App:**
-Open the `android` folder in Android Studio and run the project.
-
-## Deployment
-
-Want to deploy your backend online? See:
-- **[QUICK_DEPLOY.md](QUICK_DEPLOY.md)** - Fast deployment (3-5 minutes)
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Comprehensive deployment guide
-
-### Recommended FREE Hosting (with persistent storage)
-
-- **Fly.io** - Completely FREE with 1GB persistent volume (Recommended)
-- **Railway** - $5 credit/month (includes storage, easiest setup)
-
-⚠️ **Note:** Render's free tier does NOT include persistent storage ($1/month extra for disk)
-
-### Download Android APK
-
-GitHub Actions automatically builds APKs:
-1. Go to **Actions** tab
-2. Click **Android Build** → **Run workflow**
-3. Download from **Artifacts**
+- **Language**: Kotlin
+- **UI**: Material Design 3
+- **Database**: Room (SQLite)
+- **Architecture**: Repository pattern
+- **Async**: Kotlin Coroutines
+- **Version**: 2.0
 
 ## Database Schema
 
 **Todos**
-- id: unique identifier
+- id: unique identifier (UUID)
 - title: todo text
 - priority: high | medium | low
 - completed: boolean
 - createdAt: timestamp
 - updatedAt: timestamp
-- tags: array of tag IDs
 
 **Tags**
-- id: unique identifier
+- id: unique identifier (UUID)
 - name: tag name
 - color: hex color code
+- createdAt: timestamp
+- updatedAt: timestamp
 
-## API Endpoints
+**Todo-Tag Relationship**
+- Many-to-many relationship between todos and tags
 
-- `GET /api/todos` - Get all todos
-- `POST /api/todos` - Create new todo
-- `PUT /api/todos/:id` - Update todo
-- `DELETE /api/todos/:id` - Delete todo
-- `GET /api/tags` - Get all tags
-- `POST /api/tags` - Create new tag
-- `PUT /api/tags/:id` - Update tag
-- `DELETE /api/tags/:id` - Delete tag
-- `GET /api/sync` - Get all data (todos + tags)
+## Legacy Backend & Web App
+
+The repository also contains a Node.js backend and React web app for reference.
+These are **not required** for the Android app to function.
+
+- Backend: `/backend` - Node.js + Express + SQLite
+- Web App: `/webapp` - React + Vite
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) if you want to set up the backend for syncing across devices.
+
+## Screenshots
+
+(Add screenshots of your app here)
+
+## Contributing
+
+Feel free to open issues or submit pull requests!
+
+## License
+
+MIT
+
+## Privacy
+
+Fennec Do stores all your data locally on your device. No data is sent to external servers. Your todos are completely private.
